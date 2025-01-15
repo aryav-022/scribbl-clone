@@ -8,5 +8,8 @@ export async function generatePlayerId() {
 }
 
 export async function checkPlayerIdAvailability(playerId: string) {
-	return true;
+	const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/player?playerId=${playerId}`, {
+		cache: "no-store",
+	});
+	return await res.json();
 }

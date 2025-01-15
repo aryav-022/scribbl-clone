@@ -10,7 +10,7 @@ export default class Debounce {
 	}
 
 	public run = async (...options: any[]): Promise<ReturnType<typeof this.callback>> => {
-		clearTimeout(this.timeout);
+		if (this.timeout) clearTimeout(this.timeout);
 
 		return new Promise<ReturnType<typeof this.callback>>((resolve) => {
 			this.timeout = setTimeout(() => {

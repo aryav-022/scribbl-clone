@@ -2,32 +2,48 @@
 
 import { useLocalStorage } from "@/hook/useLocalStorage";
 import { generateAvatar } from "@/lib/Avatar";
+import Debounce from "@/lib/Debounce";
 import { createGame, joinGame } from "@/lib/Game";
 import { checkPlayerIdAvailability, generatePlayerId } from "@/lib/PlayerId";
 import { cn } from "@/lib/utils";
+import { socket } from "@/socket";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+
+const generateAvatarDebounced = new Debounce(500, generateAvatar);
 
 export default function LoginForm() {
 	const router = useRouter();
 
 	const [playerId, setPlayerId] = useLocalStorage("playerId");
 
-	const [isPlayerIdAvailable, setIsPlayerIdAvailable] = useState(true);
+	const [playerIdInput, setPlayerIdInput] = useState({
+		ok: true,
+		helpText: {
+			message: "Player ID is available",
+			className: "text-green-600",
+		},
+	});
 
 	const playerIdInputRef = useRef<HTMLInputElement>(null);
 	const avatarButton = useRef<HTMLButtonElement>(null);
 
-	function updatePlayerId(playerId: string) {
+	function updatePlayerId(_playerId: string) {
 		if (!playerIdInputRef.current) return;
 
-		playerIdInputRef.current.value = playerId;
+		playerIdInputRef.current.value = _playerId;
 
-		checkPlayerIdAvailability(playerId).then((isAvailable) => {
-			setIsPlayerIdAvailable(isAvailable);
+		checkPlayerIdAvailability(_playerId).then((isAvailable) => {
+			setPlayerIdInput({
+				ok: isAvailable,
+				helpText: {
+					message: isAvailable ? "Player ID is available" : "Player ID is not available",
+					className: isAvailable ? "text-green-600" : "text-red-600",
+				},
+			});
 		});
 
-		generateAvatar.run(playerId).then((avatar: string) => {
+		generateAvatarDebounced.run(_playerId).then((avatar: string) => {
 			if (avatarButton.current) {
 				avatarButton.current.innerHTML = avatar;
 			}
@@ -42,32 +58,28 @@ export default function LoginForm() {
 
 	async function handleSubmit(formData: FormData) {
 		const actionType = formData.get("action") as string;
-		const playerId = formData.get("playerId") as string;
+		const _playerId = formData.get("playerId") as string;
+
+		let roomId, res;
 
 		if (actionType === "create") {
-			const res = await createGame(playerId);
-
-			if (!res.success) {
-				alert(res.message);
-				return;
-			}
-
-			setPlayerId(playerId);
-
-			router.push(`/game/${playerId}`);
+			roomId = _playerId;
+			res = await createGame(_playerId);
 		} else {
-			const roomId = formData.get("room") as string;
-			const res = await joinGame(playerId, roomId);
-
-			if (!res.success) {
-				alert(res.error);
-				return;
-			}
-
-			setPlayerId(playerId);
-
-			router.push(`/game/${roomId}`);
+			roomId = formData.get("room") as string;
+			res = await joinGame(_playerId, roomId);
 		}
+
+		if (!res.success) {
+			alert(res.message);
+			return;
+		}
+
+		setPlayerId(_playerId);
+
+		socket.emit("join-game", roomId, _playerId);
+
+		router.push(`/game/${roomId}`);
 	}
 
 	return (
@@ -101,14 +113,8 @@ export default function LoginForm() {
 						onChange={(e) => updatePlayerId(e.target.value)}
 					/>
 
-					<p
-						className={cn(
-							"text-xs mt-1",
-							isPlayerIdAvailable ? "text-green-600" : "text-red-600"
-						)}>
-						{isPlayerIdAvailable
-							? "Player ID is available"
-							: "Player ID is not available"}
+					<p className={cn("text-xs mt-1", playerIdInput.helpText.className)}>
+						{playerIdInput.helpText.message}
 					</p>
 				</fieldset>
 
