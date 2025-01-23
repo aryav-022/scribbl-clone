@@ -65,6 +65,7 @@ export default function Panel({ roomId }: PanelProps) {
 	}, []);
 
 	const onGameOver = useCallback(() => {
+		setDisplayScore(true);
 		setEnableNewGameButton(true);
 	}, []);
 
@@ -94,6 +95,11 @@ export default function Panel({ roomId }: PanelProps) {
 	function createNewGame() {
 		setEnableNewGameButton(false);
 		setIsGameStarted(false);
+		setWord("");
+		setTurn(false);
+		setDisplayScore(false);
+		setRound(0);
+		setTotalScores([]);
 	}
 
 	return (
@@ -104,6 +110,7 @@ export default function Panel({ roomId }: PanelProps) {
 						totalScores={totalScores}
 						gameEnded={enableNewGameButton}
 						createNewGame={createNewGame}
+						isAdmin={isAdmin}
 					/>
 				) : (
 					<>
