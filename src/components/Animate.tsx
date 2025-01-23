@@ -1,8 +1,8 @@
-interface AnimateProps {
+interface AnimateProps<T extends React.Key> {
 	children: React.ReactNode;
-	animateOn: any;
+	animateOn: T;
 }
 
-export default function Animate({ children, animateOn }: AnimateProps) {
+export default function Animate<T extends React.Key>({ children, animateOn }: AnimateProps<T>) {
 	return <div key={animateOn}>{children}</div>;
 }

@@ -1,18 +1,18 @@
-export default class Debounce {
-	private timeout: any;
+export default class Debounce<T, R> {
+	private timeout: NodeJS.Timeout | null;
 	private delay: number;
-	private callback: (...options: any[]) => any;
+	private callback: (...options: T[]) => R;
 
-	constructor(delay: number, callback: (...options: any[]) => any) {
+	constructor(delay: number, callback: (...options: T[]) => R) {
 		this.delay = delay;
 		this.callback = callback;
 		this.timeout = null;
 	}
 
-	public run = async (...options: any[]): Promise<ReturnType<typeof this.callback>> => {
+	public run = async (...options: T[]): Promise<R> => {
 		if (this.timeout) clearTimeout(this.timeout);
 
-		return new Promise<ReturnType<typeof this.callback>>((resolve) => {
+		return new Promise<R>((resolve) => {
 			this.timeout = setTimeout(() => {
 				const result = this.callback(...options);
 				resolve(result);

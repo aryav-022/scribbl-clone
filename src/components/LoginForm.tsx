@@ -15,7 +15,7 @@ const generateAvatarDebounced = new Debounce(500, generateAvatar);
 export default function LoginForm() {
 	const router = useRouter();
 
-	const [playerId, setPlayerId] = useLocalStorage<string | null>("playerId", null, {
+	const [, setPlayerId] = useLocalStorage<string | null>("playerId", null, {
 		initializeWithValue: false,
 	});
 

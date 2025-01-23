@@ -33,6 +33,27 @@ export default function Canvas({ turn }: CanvasProps) {
 
 	const drawPaths = useRef<Point[]>([]);
 
+	const drawPoint = useCallback(
+		(point: Point) => {
+			if (context) {
+				if (point.type === "start") {
+					context.beginPath();
+					context.moveTo(point.x, point.y);
+				} else if (point.type === "draw") {
+					context.strokeStyle = "white"; // Set line color to black
+					context.lineWidth = 2; // Set line width
+					context.lineCap = "round";
+
+					context.lineTo(point.x, point.y);
+					context.stroke();
+				} else if (point.type === "stop") {
+					context.closePath();
+				}
+			}
+		},
+		[context]
+	);
+
 	// setup context state variable
 	useEffect(() => {
 		if (canvasRef.current) {
@@ -73,28 +94,7 @@ export default function Canvas({ turn }: CanvasProps) {
 
 		// Cleanup on component unmount
 		return () => window.removeEventListener("resize", resizeCanvas);
-	}, [context]);
-
-	const drawPoint = useCallback(
-		(point: Point) => {
-			if (context) {
-				if (point.type === "start") {
-					context.beginPath();
-					context.moveTo(point.x, point.y);
-				} else if (point.type === "draw") {
-					context.strokeStyle = "white"; // Set line color to black
-					context.lineWidth = 2; // Set line width
-					context.lineCap = "round";
-
-					context.lineTo(point.x, point.y);
-					context.stroke();
-				} else if (point.type === "stop") {
-					context.closePath();
-				}
-			}
-		},
-		[context]
-	);
+	}, [context, drawPoint]);
 
 	const onDraw = useCallback(
 		(point: Point) => {
