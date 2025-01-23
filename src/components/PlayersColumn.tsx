@@ -1,9 +1,8 @@
 "use client";
 
+import { useSocketEvent } from "@/hook/useSocketEvent";
 import { useCallback, useEffect, useState } from "react";
 import PlayerCard from "./PlayerCard";
-import { socket } from "@/socket";
-import { useSocketEvent } from "@/hook/useSocketEvent";
 
 interface PlayersColumnParams {
 	initialPlayers: string[];

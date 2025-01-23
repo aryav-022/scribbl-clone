@@ -1,6 +1,5 @@
 "use client";
 
-import { useLocalStorage } from "@/hook/useLocalStorage";
 import { generateAvatar } from "@/lib/Avatar";
 import Debounce from "@/lib/Debounce";
 import { createGame, joinGame } from "@/lib/Game";
@@ -9,13 +8,16 @@ import { cn } from "@/lib/utils";
 import { socket } from "@/socket";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useLocalStorage } from "usehooks-ts";
 
 const generateAvatarDebounced = new Debounce(500, generateAvatar);
 
 export default function LoginForm() {
 	const router = useRouter();
 
-	const [playerId, setPlayerId] = useLocalStorage("playerId");
+	const [playerId, setPlayerId] = useLocalStorage<string | null>("playerId", null, {
+		initializeWithValue: false,
+	});
 
 	const [playerIdInput, setPlayerIdInput] = useState({
 		ok: true,

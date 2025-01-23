@@ -1,8 +1,8 @@
 import PlayersColumn from "@/components/PlayersColumn";
-import Canvas from "@/components/Panel";
-import MessageInputBox from "@/components/MessageInputBox";
+import Panel from "@/components/Panel";
 import { checkRoomExists } from "@/lib/Game";
 import { redirect } from "next/navigation";
+import GuessInputBox from "@/components/GuessInputBox";
 
 interface GamePageParams {
 	params: Promise<{
@@ -27,8 +27,8 @@ export default async function GamePage({ params }: GamePageParams) {
 			<PlayersColumn initialPlayers={initialPlayers} />
 
 			<div className='h-full grow flex flex-col'>
-				<Canvas roomId={roomId} />
-				<MessageInputBox roomId={roomId} />
+				<Panel roomId={roomId} />
+				<GuessInputBox />
 			</div>
 		</div>
 	);

@@ -14,8 +14,9 @@ export default {
 				foreground: "var(--foreground)",
 			},
 			animation: {
-				'mount': 'mount 4s linear forwards',
-			}
+				"mount-up": "mount-up 0.2s linear forwards",
+				"mount-right": "mount-right 4s linear forwards",
+			},
 		},
 	},
 	plugins: [
